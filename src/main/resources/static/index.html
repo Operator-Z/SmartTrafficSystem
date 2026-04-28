@@ -25,8 +25,7 @@
   <div id="output">Output will appear here...</div>
 
   <script>
-    const API = "smarttrafficsystem-production.up.railway.app"; // change port if needed
-
+  const API = "https://smarttrafficsystem-production.up.railway.app/api/traffic";
     async function processEvent() {
       const body = {
         vehicleId: document.getElementById("vehicleId").value,
