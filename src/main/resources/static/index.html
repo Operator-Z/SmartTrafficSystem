@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Traffic System</title>
+  <style>
+    body { font-family: Arial; max-width: 500px; margin: 50px auto; }
+    input, button { width: 100%; padding: 8px; margin: 5px 0; box-sizing: border-box; }
+    button { background: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
+    button:hover { background: #0056b3; }
+    #output { margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+    h2 { color: #333; }
+  </style>
+</head>
+<body>
+  <h2>🚦 Smart Traffic System</h2>
+
+  <input id="vehicleId" placeholder="Vehicle ID (e.g. MH12AB1234)" />
+  <input id="speed" type="number" placeholder="Speed (km/h)" />
+  <input id="zone" placeholder="Zone (e.g. PUNE_WEST)" />
+  <label><input id="emergency" type="checkbox" /> Emergency Vehicle</label>
+  <br/><br/>
+  <button onclick="processEvent()">Process Event</button>
+  <button onclick="loadViolations()" style="background:#28a745; margin-top:5px;">View All Violations</button>
+
+  <div id="output">Output will appear here...</div>
+
+  <script>
+    const API = "http://localhost:8081/api/traffic"; // change port if needed
+
+    async function processEvent() {
+      const body = {
+        vehicleId: document.getElementById("vehicleId").value,
+        speed: parseFloat(document.getElementById("speed").value),
+        zone: document.getElementById("zone").value,
+        emergency: document.getElementById("emergency").checked
+      };
+
+      const res = await fetch(`${API}/process`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      document.getElementById("output").innerText = await res.text();
+    }
+
+    async function loadViolations() {
+      const res = await fetch(`${API}/violations`);
+      const data = await res.json();
+
+      if (data.length === 0) {
+        document.getElementById("output").innerText = "No violations found.";
+        return;
+      }
+
+      let html = "<b>All Violations:</b><br><br>";
+      data.forEach(v => {
+        html += `🚗 ${v.vehicleId} | Speed: ${v.speed} | Zone: ${v.zone} | Fine: ₹${v.fine}<br>`;
+      });
+
+      document.getElementById("output").innerHTML = html;
+    }
+  </script>
+</body>
+</html>
